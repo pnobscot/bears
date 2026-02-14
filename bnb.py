@@ -3,11 +3,11 @@ from enum import Enum
 import random
 
 # # CONSTANTS GO HERE
-# TEMP = 6 # stealing from others
-# REWARD = 4 # cooperating with others
-# PUNISH = 1 # both stealing
-# SUCKERS = 0 # stolen from
-# SOLO = 2 # play by yo self
+TEMP = 6 # stealing from others
+REWARD = 4 # cooperating with others
+PUNISH = 1 # both stealing
+SUCKERS = 0 # stolen from
+SOLO = 2 # play by yo self
 
 # how many solo games are played after 2 betrayals
 NUM_SOLO_GAMES = 3
