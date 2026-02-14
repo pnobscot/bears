@@ -173,7 +173,7 @@ def format_with_commas(num):
     else:
         return num
 
-def print_results_per_strat(eff, ste, ran, wsls, wolf, eye, grim, gen):
+def print_results_overall(eff, ste, ran, wsls, wolf, eye, grim, gen):
     filename="bear_results_overall.txt"
 
     rows = [
@@ -347,7 +347,7 @@ def play_and_record_lifetime(num_seasons, num_strat):
     play_lifetime(num_seasons, bears)
 
     eff, ste, ran, wsls, wolf, eye, grim, gen = collect_data(bears, num_seasons, num_strat)
-    print_results_per_strat(eff, ste, ran, wsls, wolf, eye, grim, gen)
+    print_results_overall(eff, ste, ran, wsls, wolf, eye, grim, gen)
     print_head_to_head_bpg(bears)
 
 def main():
