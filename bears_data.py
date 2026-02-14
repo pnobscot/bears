@@ -351,14 +351,14 @@ def play_and_record_lifetime(num_seasons, num_strat):
     print_head_to_head_bpg(bears)
 
 def main():
-    seasons_in_a_lifetime = 6
-    bears_of_each_strat = 30
+    seasons_in_a_lifetime = 5
+    bears_of_each_strat = 20
 
     play_and_record_lifetime(seasons_in_a_lifetime, bears_of_each_strat)
 
-    gen_berries, bear_bpg, f = find_best_society(seasons_in_a_lifetime, bears_of_each_strat)
-    print(f'Ideal society: {f}% forgiveness yields {format_with_commas(gen_berries)} berries with {seasons_in_a_lifetime} seasons in a lifetime')
-    print(f'In this society, each bear averaged {bear_bpg:.2f} berries per game.')
+    # gen_berries, bear_bpg, f = find_best_society(seasons_in_a_lifetime, bears_of_each_strat)
+    # print(f'Ideal society: {f}% forgiveness yields {format_with_commas(gen_berries)} berries with {seasons_in_a_lifetime} seasons in a lifetime')
+    # print(f'In this society, each bear averaged {bear_bpg:.2f} berries per game.')
 
 if __name__ == "__main__":
     main()
