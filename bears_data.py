@@ -352,7 +352,7 @@ def play_and_record_lifetime(num_seasons, num_strat):
 
 def main():
     seasons_in_a_lifetime = 5
-    bears_of_each_strat = 20
+    bears_of_each_strat = 25
 
     play_and_record_lifetime(seasons_in_a_lifetime, bears_of_each_strat)
 
