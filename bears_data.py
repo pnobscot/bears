@@ -213,10 +213,24 @@ def print_results_overall(eff, ste, ran, wsls, wolf, eye, grim, gen):
                  "Berries \nper Round " + extra, 
                  "Solo \nGames Played", 
                  "Percent \nEffort Choices"],
-        tablefmt="rounded_grid"
+        tablefmt="rounded_grid",
+        colalign=('left', 'left','left','left','left','left','left')
     )
+    # solo games played
+    sgp = 'Solo Games After Betrayal: ' + str(bnb.NUM_SOLO_GAMES)
+    gpr = 'Games per Round: ' + str(bnb.GAMES_PER_ROUND)
+    fc = 'Forgiveness Chance: ' + str(bnb.FORGIVENESS_CHANCE)
+    sim_constants_table = tabulate([[sgp, gpr, fc]], tablefmt='rounded_grid', ) + '\n'
+
+    t = 'T: ' + str(bnb.TEMP)
+    r = 'R: ' + str(bnb.REWARD)
+    p = 'P: ' + str(bnb.PUNISH)
+    s = 'S: ' + str(bnb.SUCKERS)
+    berry_game_vals_table = tabulate([[t], [r], [p], [s]], tablefmt='plain') + '\n'
 
     with open(filename, "w", encoding="utf-8") as f:
+        f.write(sim_constants_table)
+        f.write(berry_game_vals_table)
         f.write(table_str + "\n")   
 
 # ai wrote this puppy because i was feeling lazy
