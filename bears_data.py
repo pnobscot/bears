@@ -226,7 +226,9 @@ def print_results_overall(eff, ste, ran, wsls, wolf, eye, grim, gen):
     r = 'R: ' + str(bnb.REWARD)
     p = 'P: ' + str(bnb.PUNISH)
     s = 'S: ' + str(bnb.SUCKERS)
-    berry_game_vals_table = tabulate([[t], [r], [p], [s]], tablefmt='plain') + '\n'
+    solo = 'Solo: ' + str(bnb.SOLO)
+
+    berry_game_vals_table = tabulate([[t], [r], [p], [s], [solo]], tablefmt='plain') + '\n'
 
     with open(filename, "w", encoding="utf-8") as f:
         f.write(sim_constants_table)
