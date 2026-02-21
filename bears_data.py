@@ -418,7 +418,7 @@ def main():
 
     play_and_record_lifetime(seasons_in_a_lifetime, bears_of_each_strat)
 
-    record_best_society(seasons_in_a_lifetime, bears_of_each_strat, 'best_society.txt')
+    record_best_society(seasons_in_a_lifetime, bears_of_each_strat, 'best_society_3.txt')
     
 
 if __name__ == "__main__":
