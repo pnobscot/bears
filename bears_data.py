@@ -395,7 +395,7 @@ def record_best_society(num_seasons, num_strat, filename):
 
     str1 = f'Ideal society: {f}% forgiveness yields {format_with_commas(gen_berries)} berries with {num_seasons} seasons in a lifetime.'
     str2 = f'In this society, each bear averaged {bear_bpg:.2f} berries per game.'
-    results_str = str1 + '\n' + str2
+    best_society_str = '\n' + str1 + '\n' + str2 + '\n\n'
 
     sgp, gpr, _ = get_sim_constants()
     sim_constants_table = tabulate([[sgp, gpr, 'Forgiveness Chance: Variable']], tablefmt='rounded_grid', ) + '\n'
@@ -403,12 +403,13 @@ def record_best_society(num_seasons, num_strat, filename):
     t, r, p, s, solo = get_game_constants()
     berry_game_vals_table = tabulate([[t], [r], [p], [s], [solo]], tablefmt='plain') + '\n'
 
-    results_headers = ['Forgiveness Chance', 'Average Berries\nAcross Lifetime', 'Average Berries per\nBear per Game']
-    results_str = tabulate(all_society_avgs, headers=results_headers, tablefmt='rounded_grid', colalign=['left', 'eft', 'left'])
+    results_headers = ['Forgiveness Chance', 'Average Berries\nAcross 10 Lifetimes', 'Average Berries per\nBear per Game']
+    results_str = tabulate(all_society_avgs, headers=results_headers, tablefmt='rounded_grid', colalign=['left', 'left', 'left'])
 
     with open(filename, "w", encoding="utf-8") as f:
         f.write(sim_constants_table)
         f.write(berry_game_vals_table)
+        f.write(best_society_str)
         f.write(results_str)   
 
 def main():
@@ -418,7 +419,6 @@ def main():
     play_and_record_lifetime(seasons_in_a_lifetime, bears_of_each_strat)
 
     record_best_society(seasons_in_a_lifetime, bears_of_each_strat, 'best_society.txt')
-
     
 
 if __name__ == "__main__":
