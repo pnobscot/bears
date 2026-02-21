@@ -216,24 +216,31 @@ def print_results_overall(eff, ste, ran, wsls, wolf, eye, grim, gen):
         tablefmt="rounded_grid",
         colalign=('left', 'left','left','left','left','left','left')
     )
-    # solo games played
-    sgp = 'Solo Games After Betrayal: ' + str(bnb.NUM_SOLO_GAMES)
-    gpr = 'Games per Round: ' + str(bnb.GAMES_PER_ROUND)
-    fc = 'Forgiveness Chance: ' + str(bnb.FORGIVENESS_CHANCE)
+    sgp, gpr, fc = get_sim_constants()
     sim_constants_table = tabulate([[sgp, gpr, fc]], tablefmt='rounded_grid', ) + '\n'
 
-    t = 'T: ' + str(bnb.TEMP)
-    r = 'R: ' + str(bnb.REWARD)
-    p = 'P: ' + str(bnb.PUNISH)
-    s = 'S: ' + str(bnb.SUCKERS)
-    solo = 'Solo: ' + str(bnb.SOLO)
-
+    t, r, p, s, solo = get_game_constants()
     berry_game_vals_table = tabulate([[t], [r], [p], [s], [solo]], tablefmt='plain') + '\n'
 
     with open(filename, "w", encoding="utf-8") as f:
         f.write(sim_constants_table)
         f.write(berry_game_vals_table)
         f.write(table_str + "\n")   
+
+def get_game_constants():
+    t = 'T: ' + str(bnb.TEMP)
+    r = 'R: ' + str(bnb.REWARD)
+    p = 'P: ' + str(bnb.PUNISH)
+    s = 'S: ' + str(bnb.SUCKERS)
+    solo = 'Solo: ' + str(bnb.SOLO)
+    return t, r, p, s, solo
+
+def get_sim_constants():
+    sgp = 'Solo Games After Betrayal: ' + str(bnb.NUM_SOLO_GAMES)
+    gpr = 'Games per Round: ' + str(bnb.GAMES_PER_ROUND)
+    fc = 'Forgiveness Chance: ' + str(bnb.FORGIVENESS_CHANCE)
+    return sgp, gpr, fc
+
 
 # ai wrote this puppy because i was feeling lazy
 def print_head_to_head_bpg(bears: list[bnb.Bear]):
@@ -263,9 +270,18 @@ def print_head_to_head_bpg(bears: list[bnb.Bear]):
                 continue
             stats[bear_strategy][opponent_strategy]["games"] += data["games"]
             stats[bear_strategy][opponent_strategy]["berries"] += data["berries"]
+    
+    # constants above file
+    sgp, gpr, fc = get_sim_constants()
+    sim_constants_table = tabulate([[sgp, gpr, fc]], tablefmt='rounded_grid', ) + '\n'
+    t, r, p, s, solo = get_game_constants()
+    berry_game_vals_table = tabulate([[t], [r], [p], [s], [solo]], tablefmt='plain') + '\n'
 
     # write everything to file
     with open(filename, "w", encoding="utf-8") as f:
+        f.write(sim_constants_table)
+        f.write(berry_game_vals_table)
+
         for strategy in strategies:
             rows = []
             for opponent in strategies:
@@ -328,8 +344,12 @@ def find_best_society(num_seasons, num_strat):
     most_berries = 0
     best_forgiveness = 0
     bpg = 0
+
+    # keep a list to return all of the iterations of our societal experiment
+    all_society_averages = []
+
     # loop through and test forgiveness
-    for i in range(101):
+    for i in range(3):
 
         # now set/increment the forgiveness by .01
         # forgiveness = index / 100: i = 0 gives 0/100 = .00    ->
@@ -339,9 +359,13 @@ def find_best_society(num_seasons, num_strat):
         # for 10 trials, what is the average bpgen on this forgiveness level?
         avg_gen, avg_bear = avg_bp_lifetime(num_seasons, 10, num_strat)
 
+
         # debug
         print(f'Forgivness level being tested: {bnb.FORGIVENESS_CHANCE}')
         print(f'Average berries across 10 iterations at this level: {format_with_commas(avg_gen)}')
+
+        # add to all of them so that we can print them out
+        all_society_averages.append([format_with_commas(bnb.FORGIVENESS_CHANCE), format_with_commas(avg_gen), format_with_commas(avg_bear)])
 
         # compare this berry av to our best berry obtaining generation
         if avg_gen > most_berries:
@@ -350,7 +374,7 @@ def find_best_society(num_seasons, num_strat):
             best_forgiveness = bnb.FORGIVENESS_CHANCE
             bpg = avg_bear
         
-    return most_berries, bpg, best_forgiveness
+    return most_berries, bpg, best_forgiveness, all_society_averages
 
 def create_equal_generation(b: int):
     # b is the number of bears to create of each strat type 
@@ -366,15 +390,36 @@ def play_and_record_lifetime(num_seasons, num_strat):
     print_results_overall(eff, ste, ran, wsls, wolf, eye, grim, gen)
     print_head_to_head_bpg(bears)
 
+def record_best_society(num_seasons, num_strat, filename):
+    gen_berries, bear_bpg, f, all_society_avgs = find_best_society(num_seasons, num_strat)
+
+    str1 = f'Ideal society: {f}% forgiveness yields {format_with_commas(gen_berries)} berries with {num_seasons} seasons in a lifetime.'
+    str2 = f'In this society, each bear averaged {bear_bpg:.2f} berries per game.'
+    results_str = str1 + '\n' + str2
+
+    sgp, gpr, _ = get_sim_constants()
+    sim_constants_table = tabulate([[sgp, gpr, 'Forgiveness Chance: Variable']], tablefmt='rounded_grid', ) + '\n'
+
+    t, r, p, s, solo = get_game_constants()
+    berry_game_vals_table = tabulate([[t], [r], [p], [s], [solo]], tablefmt='plain') + '\n'
+
+    results_headers = ['Forgiveness Chance', 'Average Berries\nAcross Lifetime', 'Average Berries per\nBear per Game']
+    results_str = tabulate(all_society_avgs, headers=results_headers, tablefmt='rounded_grid', colalign=['left', 'eft', 'left'])
+
+    with open(filename, "w", encoding="utf-8") as f:
+        f.write(sim_constants_table)
+        f.write(berry_game_vals_table)
+        f.write(results_str)   
+
 def main():
     seasons_in_a_lifetime = 5
     bears_of_each_strat = 25
 
     play_and_record_lifetime(seasons_in_a_lifetime, bears_of_each_strat)
 
-    # gen_berries, bear_bpg, f = find_best_society(seasons_in_a_lifetime, bears_of_each_strat)
-    # print(f'Ideal society: {f}% forgiveness yields {format_with_commas(gen_berries)} berries with {seasons_in_a_lifetime} seasons in a lifetime')
-    # print(f'In this society, each bear averaged {bear_bpg:.2f} berries per game.')
+    record_best_society(seasons_in_a_lifetime, bears_of_each_strat, 'best_society.txt')
+
+    
 
 if __name__ == "__main__":
     main()

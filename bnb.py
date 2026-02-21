@@ -4,11 +4,11 @@ import random
 
 
 # CONSTANTS GO HERE
-TEMP = 6 # stealing from others
+TEMP = 5 # stealing from others
 REWARD = 4 # cooperating with others
-PUNISH = 2 # both stealing
+PUNISH = 1 # both stealing
 SUCKERS = 0 # stolen from
-SOLO = 3 # play by yo self
+SOLO = 2 # play by yo self
 
 # how many solo games are played after 2 betrayals
 NUM_SOLO_GAMES = 3
