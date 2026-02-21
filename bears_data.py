@@ -349,7 +349,7 @@ def find_best_society(num_seasons, num_strat):
     all_society_averages = []
 
     # loop through and test forgiveness
-    for i in range(3):
+    for i in range(101):
 
         # now set/increment the forgiveness by .01
         # forgiveness = index / 100: i = 0 gives 0/100 = .00    ->
