@@ -2,12 +2,13 @@ from abc import ABC, abstractmethod
 from enum import Enum
 import random
 
-# # CONSTANTS GO HERE
-# TEMP = 6 # stealing from others
-# REWARD = 4 # cooperating with others
-# PUNISH = 1 # both stealing
-# SUCKERS = 0 # stolen from
-# SOLO = 2 # play by yo self
+
+# CONSTANTS GO HERE
+TEMP = 6 # stealing from others
+REWARD = 4 # cooperating with others
+PUNISH = 2 # both stealing
+SUCKERS = 0 # stolen from
+SOLO = 3 # play by yo self
 
 # how many solo games are played after 2 betrayals
 NUM_SOLO_GAMES = 3
@@ -120,8 +121,8 @@ class WinStayLoseShift(Strategy):
     def update_memory(self, bear: Bear, partner_bear_id: int):
         berries_gained = bear.berries - self.berries_last_game
 
-        # if we did not gain 4 or 6 berries, switch move
-        if berries_gained < 3:
+        # if we did not gain TEMP or REWARD berries, switch move
+        if berries_gained < REWARD:
             self.switch_move()
         self.berries_last_game = bear.berries
     
@@ -159,13 +160,13 @@ class EyeForEye(Strategy):
     def update_memory(self, bear: Bear, partner_bear_id: int):
         berries_gained = bear.berries - self.berries_last_game
         opponent_last_move = None
-        # 4 berries = cooperation, 6 = we stole
+        # reward means we cooperated, temp means they cooperated
         # either way, the opponent did effort, so we copy
-        if berries_gained == 4 or berries_gained == 6:
+        if berries_gained == REWARD or berries_gained == TEMP:
             opponent_last_move = MoveType.EFFORT
-        # 0 berries = betrayal, 2 berries = both steal
+        # suckers = got stolen from, punish = we both stole
         # either way, the opponent stole, so we copy
-        if berries_gained == 0 or berries_gained == 2:
+        if berries_gained == SUCKERS or berries_gained == PUNISH:
             opponent_last_move = MoveType.STEAL
         # other amounts of berries come from solo games, 
         # or lone wolf rounds. neither should change strategy
@@ -199,9 +200,9 @@ class GrimTrigger(Strategy):
         if bear.memory.get(partner_bear_id) == None:
             berries_gained = bear.berries - self.berries_last_game
             trigger = None
-            # 0 berries = betrayal
+            # suckers = we have been betrayed
             # our trigger will now flip
-            if berries_gained == 0:
+            if berries_gained == SUCKERS:
                 trigger = MoveType.STEAL
             # 2, 4, and 6 berries don't matter
             # other amounts of berries come from solo games,
@@ -229,27 +230,27 @@ def play_berry_game(b1: Bear, b2: Bear):
 
     # cooperation / reward
     if b1move == MoveType.EFFORT and b2move == MoveType.EFFORT:
-        b1_berries += 4
-        b2_berries += 4
+        b1_berries += REWARD
+        b2_berries += REWARD
         outcome = name1+' and '+name2+' cooperated!'
         b1.times_cooperated += 1
         b2.times_cooperated += 1
     # both steal / punishment
     elif b1move == MoveType.STEAL and b2move == MoveType.STEAL:
-        b1_berries += 2
-        b2_berries += 2
+        b1_berries += PUNISH
+        b2_berries += PUNISH
         outcome = name1+' and '+name2+' tried to steal from each other.'
     # suckers payoff, bear 2 steals
     elif b1move == MoveType.EFFORT and b2move == MoveType.STEAL:
-        b1_berries += 0
-        b2_berries += 6
+        b1_berries += SUCKERS
+        b2_berries += TEMP
         outcome = name2+' stole from '+name1+'!'
         thief = b2
         b1.times_cooperated += 1
     # suckers payoff, bear 1 steals
     elif b1move == MoveType.STEAL and b2move == MoveType.EFFORT:
-        b1_berries += 6
-        b2_berries += 0
+        b1_berries += TEMP
+        b2_berries += SUCKERS
         outcome = name1+' stole from '+name2+'!'
         thief = b1
         b2.times_cooperated += 1
@@ -282,11 +283,11 @@ def play_solo_games(normal_games_played_this_round: int, b1: Bear, b2: Bear):
         num_solo_games = (GAMES_PER_ROUND - normal_games_played_this_round)
 
     solo_games_played = 0
-    # give each bear 3 berries until we have played all needed games
+    # give each bear SOLO berries until we have played all needed games
     while solo_games_played < num_solo_games:
-        # give each bear 3 berries
-        b1.berries += 3
-        b2.berries += 3
+        # give each bear SOLO berries
+        b1.berries += SOLO
+        b2.berries += SOLO
         # count this as a game played
         solo_games_played += 1
     # at this point, we have played the correct amount of solo games
@@ -363,7 +364,7 @@ def play_round(b1: Bear, b2: Bear):
 # playing with lone wolf does not change your strategy at all
 def lone_wolf_round(b1: Bear, b2: Bear):
     # give each bear berries
-    berries_to_collect = 3 * GAMES_PER_ROUND
+    berries_to_collect = SOLO * GAMES_PER_ROUND
     b1.berries += berries_to_collect
     b2.berries += berries_to_collect
 
@@ -507,31 +508,7 @@ def print_stats_for_bears(bears: list[Bear]):
     for bear in bears:
         bear.print_stats()
 
-def collect_total_berries_and_bpg_per_strat(bears: list[Bear]):
-    effort_berries = 0
-    steal_berries = 0
-    random_berries = 0
-    wsls_berries = 0
-    wolf_berries = 0
-    eye_berries = 0
-    grim_berries = 0
 
-    for bear in bears:
-        if isinstance(bear.strategy, AlwaysEffort):
-            effort_berries += bear.berries
-        elif isinstance(bear.strategy, AlwaysSteal):
-            steal_berries += bear.berries
-        elif isinstance(bear.strategy, Random):
-            random_berries += bear.berries
-        elif isinstance(bear.strategy, WinStayLoseShift):
-            wsls_berries += bear.berries
-        elif isinstance(bear.strategy, LoneWolf):
-            wolf_berries += bear.berries
-        elif isinstance(bear.strategy, EyeForEye):
-            eye_berries += bear.berries
-        elif isinstance(bear.strategy, GrimTrigger):
-            grim_berries += bear.berries
-    return effort_berries, steal_berries, random_berries, wsls_berries, wolf_berries, eye_berries, grim_berries
 
 def main():
     kenai = Bear(AlwaysSteal())
