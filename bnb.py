@@ -521,14 +521,15 @@ def main():
 if __name__ == "__main__":
     main()
 
+# main idea: 
 # 50 bears are made of each different strat
 # bears play all other bears
 # these bears play 10 games in a round, in the same bear pairing
-# this ^ is 1 season, we repeat this for several seasons 
-# if bears are stolen from twice, they play solo games
+# if bears are stolen from twice, they play 3 solo games
 # bears can forgive (% chance) after solo games to resume normal games
+# this ^ is 1 season, we repeat this for several seasons 
+# several seasons = lifetime
 
-#TODO: evolution????
 
 
   

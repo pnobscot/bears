@@ -5,7 +5,7 @@ T: 6
 R: 4
 P: 2
 S: 0
-Solo: 3
+Solo: 3 
 
 Ideal society: 0.95% forgiveness yields 4,895,069.20 berries with 5 seasons in a lifetime.
 In this society, each bear averaged 3.22 berries per game.

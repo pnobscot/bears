@@ -243,6 +243,7 @@ def get_sim_constants():
 
 
 # ai wrote this puppy because i was feeling lazy
+# but it just shows how well each strategy did vs other strategies
 def print_head_to_head_bpg(bears: list[bnb.Bear]):
     filename="bear_head_to_head.txt"
 
